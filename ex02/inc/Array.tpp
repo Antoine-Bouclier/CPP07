@@ -5,26 +5,30 @@
 
 /* -- Constructors -- */
 template <typename T>
-Array<T>::Array()
+Array<T>::Array() : _array(new Array[]), _size(0)
 {
-
 }
 template <typename T>
-Array<T>::Array(unsigned int size)
+Array<T>::Array(unsigned int size) : _array(new Array[size]), _size(size)
 {
-
 }
 template <typename T>
 Array<T>::Array(Array const &copy)
 {
-
+	this->_size = copy._size;
+	this = copy;
 }
 
 /* -- Operators -- */
 template <typename T>
 Array<T>	&Array<T>::operator=(Array const &copy)
 {
-	
+	if (*this != copy)
+	{
+		delete this->_array[];
+		this->_array = new Array(this->_size);
+	}
+	return (*this);
 }
 
 template <typename T>
