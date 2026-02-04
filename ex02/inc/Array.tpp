@@ -65,6 +65,7 @@ unsigned int	Array<T>::size() const
 template <typename T>
 Array<T>::~Array()
 {
+	delete [] this->_array;
 }
 template <typename T>
 const char*	Array<T>::OutOfBoundsException::what() const throw()
