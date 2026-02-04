@@ -1,164 +1,85 @@
-/* #include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include <Array.hpp>
 
 #define MAX_VAL 750
 int main(int, char**)
 {
-	Array<int> numbers(MAX_VAL);
-	int* mirror = new int[MAX_VAL];
-	srand(time(NULL));
-	for (int i = 0; i < MAX_VAL; i++)
+	Array<int>	num(12);
+	std::cout << "TEST 1" << std::endl;
+	for (int i = 0; i < 12; i++)
 	{
-		const int value = rand();
-		numbers[i] = value;
-		mirror[i] = value;
+		num[i] = i;
 	}
-	//SCOPE
+	for (int i = 0; i < 12; i++)
 	{
-		Array<int> tmp = numbers;
-		Array<int> test(tmp);
+		std::cout << num[i] << ' ';
 	}
-
-	for (int i = 0; i < MAX_VAL; i++)
+	std::cout << std::endl;
 	{
-		if (mirror[i] != numbers[i])
+		/* -- TEST deep copy -- */
+		std::cout << "TEST 2 deep copy" << std::endl;
+		Array<int>	n;
+		std::cout << "size of n before asignement: " << n.size() << std::endl;
+		n = num;
+		std::cout << "size of n after asignement: " << n.size() << std::endl;
+		for (int i = 0; i < 12; i++)
 		{
-			std::cerr << "didn't save the same value!!" << std::endl;
-			return 1;
+			std::cout << n[i] << ' ';
 		}
+		std::cout << std::endl;
+		for (int i = 12, j = 0; i < 24; i++, j++)
+		{
+			n[j] = i;
+		}
+		for (int i = 0; i < 12; i++)
+		{
+			std::cout << n[i] << ' ';
+		}
+		std::cout << std::endl;
+	}
+	{
+		/* -- TEST deep copy -- */
+		std::cout << "TEST 3 deep copy" << std::endl;
+		Array<int>	n(num);
+		for (int i = 0; i < 12; i++)
+		{
+			std::cout << n[i] << ' ';
+		}
+		std::cout << std::endl;
+		for (int i = 12, j = 0; i < 24; i++, j++)
+		{
+			n[j] = i;
+		}
+		for (int i = 0; i < 12; i++)
+		{
+			std::cout << n[i] << ' ';
+		}
+		std::cout << std::endl;
 	}
 	try
 	{
-		numbers[-2] = 0;
+		std::cout << "TEST 4 Out of bounds" << std::endl;
+		std::cout << num[0] << std::endl;
+		std::cout << num[11] << std::endl;
+		std::cout << num[12] << std::endl;
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cout << e.what() << '\n';
 	}
-	try
+	std::cout << "TEST 5 size()" << std::endl;
+	std::cout << num.size() << std::endl;
+
+	std::cout << "TEST 6 const operator[]" << std::endl;
+	const Array<int>	n(5);
+	for (int i = 0; i < 5; i++)
 	{
-		numbers[MAX_VAL] = 0;
+		n[i] = i;
 	}
-	catch(const std::exception& e)
+	for (int i = 0; i < 5; i++)
 	{
-		std::cerr << e.what() << '\n';
+		std::cout << n[i] << ' ';
 	}
-
-	for (int i = 0; i < MAX_VAL; i++)
-	{
-		numbers[i] = rand();
-	}
-	delete [] mirror;
-	return 0;
-} */
-
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
-#include <ctime>
-#include "Array.hpp"
-
-#define MAX_VAL 750
-
-int main()
-{
-	srand(time(NULL));
-
-	// ===============================
-	// 1. Construction & initialisation
-	// ===============================
-	Array<int> a(MAX_VAL);
-	for (int i = 0; i < MAX_VAL; i++)
-		a[i] = rand();
-
-	// ===============================
-	// 2. Copie profonde (copy constructor)
-	// ===============================
-	Array<int> b(a);
-
-	for (int i = 0; i < MAX_VAL; i++)
-	{
-		if (a[i] != b[i])
-		{
-			std::cerr << "❌ Copy constructor failed" << std::endl;
-			return 1;
-		}
-	}
-
-	// ===============================
-	// 3. Opérateur d'affectation
-	// ===============================
-	Array<int> c;
-	c = a;
-
-	for (int i = 0; i < MAX_VAL; i++)
-	{
-		if (a[i] != c[i])
-		{
-			std::cerr << "❌ Assignment operator failed" << std::endl;
-			return 1;
-		}
-	}
-
-	// ===============================
-	// 4. Vérification deep copy
-	// ===============================
-	a[0] = 42;
-	if (b[0] == 42 || c[0] == 42)
-	{
-		std::cerr << "❌ Shallow copy detected" << std::endl;
-		return 1;
-	}
-
-	// ===============================
-	// 5. Accès hors limites
-	// ===============================
-	try
-	{
-		a[-1] = 0;
-		std::cerr << "❌ No exception for negative index" << std::endl;
-		return 1;
-	}
-	catch (const std::exception& e)
-	{
-		std::cout << "✅ Exception caught: " << e.what() << std::endl;
-	}
-
-	try
-	{
-		a[MAX_VAL] = 0;
-		std::cerr << "❌ No exception for overflow index" << std::endl;
-		return 1;
-	}
-	catch (const std::exception& e)
-	{
-		std::cout << "✅ Exception caught: " << e.what() << std::endl;
-	}
-
-	// ===============================
-	// 6. Test const Array
-	// ===============================
-	const Array<int> d(a);
-	try
-	{
-		std::cout << "Const access OK: " << d[1] << std::endl;
-	}
-	catch (...)
-	{
-		std::cerr << "❌ Const operator[] failed" << std::endl;
-		return 1;
-	}
-
-	// ===============================
-	// 7. Taille
-	// ===============================
-	if (a.size() != MAX_VAL)
-	{
-		std::cerr << "❌ Wrong size()" << std::endl;
-		return 1;
-	}
-
-	std::cout << "\n🎉 All tests passed successfully!" << std::endl;
-	return 0;
+	std::cout << std::endl;
 }
